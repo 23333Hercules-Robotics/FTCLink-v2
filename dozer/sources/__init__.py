@@ -2,8 +2,5 @@
 
 from .AbstractSources import Source, DataBasedSource
 from .RSSSources import *
-from .RedditSource import RedditSource
-from .TwitchSource import TwitchSource
 
-sources = [TwitchSource, RedditSource]
-sources += [source for source in RSSSource.__subclasses__() if not source.disabled]
+sources = [source for source in RSSSource.__subclasses__() if not source.disabled]
