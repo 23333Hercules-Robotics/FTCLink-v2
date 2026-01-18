@@ -5,8 +5,9 @@ Guild management bot for FIRST Discord servers, based on Dozer
 
 ## Key Features
 
-### 🚀 **Supabase-Based Caching System**
-- **Zero direct API polling** - All FTC Events API calls are cached in Supabase
+### 🚀 **Native PostgreSQL Caching System**
+- **Zero direct API polling** - All FTC Events API calls are cached in the existing PostgreSQL database
+- **No external hosting required** - uses Dozer's native database
 - **Smart refresh intervals**: Events (hourly), Matches (1 min), Rankings (1 min), Teams (24 hrs)
 - **Background cache updater** automatically refreshes data without user interaction
 - **95%+ reduction** in API calls and **faster response times**
@@ -41,7 +42,7 @@ Table of Contents
          * [Getting your Discord Bot Token](#getting-your-discord-bot-token)
          * [Getting Optional API Keys](tokenInstructions.md)
          * [Setting up the bot](#setting-up-the-bot)
-         * [Supabase Caching Setup](SUPABASE_SETUP.md)
+         * [Native Database Caching](CACHING.md)
          * [Adding the bot to your server](#adding-the-bot-to-your-server)
       * [Development](#development)
 
@@ -119,7 +120,7 @@ Setup configuration options:
 
 5. Add the Discord bot account's token to `discord_token` in `config.json`
 
-6. **[NEW] Supabase Caching Setup (Recommended):** FTCLink now supports Supabase-based caching to prevent direct API polling and improve performance. See [SUPABASE_SETUP.md](SUPABASE_SETUP.md) for detailed setup instructions. If you don't set up Supabase, the bot will still work but will make direct API calls.
+6. **[AUTOMATIC] Native Database Caching:** FTCLink automatically uses its native PostgreSQL database for caching FTC Events API responses. No additional setup required! The caching system prevents direct API polling and improves performance. See [CACHING.md](CACHING.md) for details.
 
 7. If you have a Blue Alliance API key or an Orange Alliance API key, add them to the appropriate places in `config.json`. For more details on how to get these API keys, [see this file for instructions](tokenInstructions.md). ***If you don't, your bot will still work,*** but you won't be able to use the commands that rely on these tokens.
 

@@ -9,7 +9,7 @@ Pool = None
 
 async def db_init(db_url):
     """Initializes the database connection"""
-    global Pool
+    global Pool  # pylint: disable=global-statement
     Pool = await asyncpg.create_pool(dsn=db_url, command_timeout=15)
 
 

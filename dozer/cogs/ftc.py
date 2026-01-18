@@ -15,7 +15,7 @@ from discord.utils import escape_markdown
 from loguru import logger
 
 from dozer.context import DozerContext
-from dozer.supabase_cache import SupabaseCacheService, BackgroundCacheUpdater
+from dozer.native_cache import NativeCacheService, BackgroundCacheUpdater
 from ._utils import *
 
 embed_color = discord.Color(0xed791e)
@@ -188,12 +188,12 @@ class FTCEventsClient:
 
 class CachedFTCEventsClient(FTCEventsClient):
     """
-    A caching wrapper around FTCEventsClient that uses Supabase for caching.
+    A caching wrapper around FTCEventsClient that uses native PostgreSQL for caching.
     This prevents direct client polling of the FTC Events API.
     """
     
     def __init__(self, username: str, token: str, aiohttp_session: aiohttp.ClientSession,
-                 cache_service: SupabaseCacheService = None,
+                 cache_service: NativeCacheService = None,
                  base_url: str = "https://ftc-api.firstinspires.org/v2.0",
                  ratelimit: bool = True):
         super().__init__(username, token, aiohttp_session, base_url, ratelimit)
@@ -201,7 +201,7 @@ class CachedFTCEventsClient(FTCEventsClient):
     
     async def reqjson_cached(self, endpoint, cache_type='teams', season=None, on_400=None, on_other=None):
         """
-        Make a cached request to the API. Checks Supabase cache first, only hits API if cache is expired.
+        Make a cached request to the API. Checks native PostgreSQL cache first, only hits API if cache is expired.
         
         Args:
             endpoint: API endpoint to request
@@ -216,7 +216,7 @@ class CachedFTCEventsClient(FTCEventsClient):
         # Generate a cache key from the endpoint
         cache_key = f"season_{season}_{endpoint.replace('/', '_').replace('?', '_')}"
         
-        # Try to get from Supabase cache first
+        # Try to get from native PostgreSQL cache first
         if self.cache_service:
             cached_data = await self.cache_service.get_cached_data(cache_type, cache_key)
             if cached_data is not None:
@@ -227,9 +227,9 @@ class CachedFTCEventsClient(FTCEventsClient):
         logger.debug(f"Fetching from API: {cache_type}/{endpoint}")
         data = await self.reqjson(endpoint, season=season, on_400=on_400, on_other=on_other)
         
-        # Store in Supabase cache if we got valid data
+        # Store in native PostgreSQL cache if we got valid data
         if data is not None and self.cache_service:
-            await self.cache_service.set_cached_data(cache_key, cache_type, data, season)
+            await self.cache_service.set_cached_data(cache_type, cache_key, data, season)
             
         return data
 
@@ -278,19 +278,9 @@ class FTCInfo(Cog):
         super().__init__(bot)
         self.http_session = bot.add_aiohttp_ses(aiohttp.ClientSession(timeout=aiohttp.ClientTimeout(5)))
         
-        # Initialize Supabase cache service
-        self.cache_service = None
-        self.cache_updater = None
-        
-        if 'supabase' in bot.config and bot.config['supabase'].get('enabled', False):
-            try:
-                self.cache_service = SupabaseCacheService(
-                    bot.config['supabase']['url'],
-                    bot.config['supabase']['key']
-                )
-                logger.info("Supabase cache service initialized for FTC data")
-            except Exception as e:
-                logger.error(f"Failed to initialize Supabase cache: {e}")
+        # Initialize native PostgreSQL cache service (uses Dozer's existing database)
+        self.cache_service = NativeCacheService()
+        logger.info("Native PostgreSQL cache service initialized for FTC data")
         
         # Initialize FTC Events client with cache
         self.ftcevents = CachedFTCEventsClient(
@@ -301,15 +291,14 @@ class FTCInfo(Cog):
         )
         self.scparser = ScoutParser(self.http_session)
         
-        # Start background cache updater if Supabase is enabled
-        if self.cache_service:
-            self.cache_updater = BackgroundCacheUpdater(
-                self.cache_service,
-                self.ftcevents,
-                self.scparser
-            )
-            bot.loop.create_task(self.cache_updater.start())
-            logger.info("Background cache updater started")
+        # Start background cache updater
+        self.cache_updater = BackgroundCacheUpdater(
+            self.cache_service,
+            self.ftcevents,
+            self.scparser
+        )
+        bot.loop.create_task(self.cache_updater.start())
+        logger.info("Background cache updater started")
     
     async def cog_unload(self):
         """Clean up when the cog is unloaded."""

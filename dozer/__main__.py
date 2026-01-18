@@ -24,11 +24,6 @@ config = {
         'username': 'Put FTC-Events username here',
         'token': 'Put FTC-Events token here'
     },
-    'supabase': {
-        'enabled': False,
-        'url': 'https://your-project.supabase.co',
-        'key': 'Put Supabase anon key here'
-    },
     'db_url': 'postgres://dozer_user:simplepass@postgres',
     'gmaps_key': "PUT GOOGLE MAPS API KEY HERE",
     'discord_token': "Put Discord API Token here.",
