@@ -149,7 +149,7 @@ class News(Cog):
     async def news(self, ctx: DozerContext):
         """Show help for news subscriptions"""
         embed = discord.Embed(title="How to subscribe to News Sources",
-                              description="Dozer has built in news scrapers to allow you to review up to date news"
+                              description="FTCLink has built in news scrapers to allow you to review up to date news"
                                           "in specific channels. See below on how to manage your server's "
                                           "subscriptions")
         embed.add_field(name="How to add a subscription",
@@ -222,7 +222,7 @@ class News(Cog):
             added = await source.add_data(data_obj)
             if not added:
                 logger.error(f"Failed to add data {data_obj} to source {source.full_name}")
-                await ctx.send("Failed to add new data source. Please contact the Dozer Administrators.")
+                await ctx.send("Failed to add new data source. Please contact the FTCLink Administrators.")
                 return
 
             data_exists = await NewsSubscription.get_by(source=source.short_name, data=str(data_obj))
@@ -284,7 +284,7 @@ class News(Cog):
                 logger.error(f"More that one subscription of {source.full_name} for channel "
                              f"{channel.mention} with data {data} found when attempting to delete.")
                 await ctx.send(f"More that one subscription of {source.full_name} for channel {channel.mention} "
-                               f"with data {data} found. Please contact the Dozer administrator for help.")
+                               f"with data {data} found. Please contact the FTCLink administrator for help.")
                 return
 
             data_exists = await NewsSubscription.get_by(source=source.short_name, data=str(data_obj))
@@ -292,7 +292,7 @@ class News(Cog):
                 removed = await source.remove_data(data_obj)
                 if not removed:
                     logger.error(f"Failed to remove data {data_obj} from source {source.full_name}")
-                    await ctx.send("Failed to remove data source. Please contact the Dozer Administrators.")
+                    await ctx.send("Failed to remove data source. Please contact the FTCLink Administrators.")
                     return
 
         else:
@@ -308,7 +308,7 @@ class News(Cog):
                     logger.error(f"More than one subscription of {source.full_name} for channel "
                                  f"{channel.mention} found when attempting to delete.")
                     raise BadArgument(f"More than one subscription of {source.full_name} for channel "
-                                      f"{channel.mention} was found. Please contact the Dozer administrators for help.")
+                                      f"{channel.mention} was found. Please contact the FTCLink administrators for help.")
 
         await NewsSubscription.delete(id=sub[0].id)
 

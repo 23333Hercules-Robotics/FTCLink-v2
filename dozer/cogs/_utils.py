@@ -16,7 +16,25 @@ from dozer import db
 from dozer.context import DozerContext
 
 __all__ = ['bot_has_permissions', 'command', 'group', 'Cog', 'Reactor', 'Paginator', 'paginate', 'chunk', 'dev_check',
-           'DynamicPrefixEntry']
+           'DynamicPrefixEntry', 'set_ftclink_footer']
+
+
+def set_ftclink_footer(embed: discord.Embed, text: str = None) -> discord.Embed:
+    """
+    Set a standardized footer for FTCLink embeds.
+    
+    Args:
+        embed: The Discord embed to set the footer on
+        text: Optional additional text to prepend before the FTCLink branding
+        
+    Returns:
+        The embed with the footer set
+    """
+    footer_text = "FTCLink · Sponsored by Orihost [orihost.xyz]"
+    if text:
+        footer_text = f"{text} | {footer_text}"
+    embed.set_footer(text=footer_text)
+    return embed
 
 
 

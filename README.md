@@ -1,12 +1,12 @@
-# Dozer
+# FTCLink
 ![CI](https://github.com/FRCDiscord/Dozer/workflows/CI/badge.svg)
 
-Omnipotent guild management bot for FIRST Discord servers
+Guild management bot for FIRST Discord servers, based on Dozer
 
 Table of Contents
 =================
 
-   * [Dozer](#dozer)
+   * [FTCLink](#ftclink)
       * [Setup](#setup)
          * [Installing Python 3.8](#installing-python-38)
             * [Manually](#manually)
@@ -45,7 +45,7 @@ Through the rest of this README, we will assume that you have found the correct 
 
 ### Installing PostgreSQL
 
-As of May 13, 2020 , Dozer no longer supports database types other than PostgreSQL. This means installations using SQLite
+As of May 13, 2020, FTCLink no longer supports database types other than PostgreSQL. This means installations using SQLite
 (as was default), will need to migrated, as well as new installations will have to have PostgreSQL installed on the 
 machine for development or production. You can install PostgreSQL for your platform [here](https://www.postgresql.org/download/)
 
@@ -72,12 +72,12 @@ machine for development or production. You can install PostgreSQL for your platf
 ### Setting up the bot
 
 Setup configuration options:
-- Dozer can be set up manually, with Python, or with Docker. 
-- Docker allows you to run programs the exact same way on different platforms using [containers](https://www.docker.com/resources/what-container). **Docker also allows Dozer to set up many of the dependencies** (particularly lavalink, which is used for the music functionality) **automatically.** To use Dozer with the Docker configuration
+- FTCLink can be set up manually, with Python, or with Docker. 
+- Docker allows you to run programs the exact same way on different platforms using [containers](https://www.docker.com/resources/what-container). **Docker also allows FTCLink to set up many of the dependencies** (particularly lavalink, which is used for the music functionality) **automatically.** To use FTCLink with the Docker configuration
 
 1. If you are using Docker, download and install it for your platform [here](https://www.docker.com/products/docker-desktop). Additional documentation can be found [here](https://docs.docker.com/desktop/), if needed.
 
-2. Open your command line/terminal interface and go to the directory where Dozer's code is located.
+2. Open your command line/terminal interface and go to the directory where FTCLink's code is located.
    1. If you're not familiar with how to do that:
       1. On Windows, open CMD or Powershell. On Mac and Linux, open the Terminal. and type `cd "path/to/directory"`.
          Alternatively, on Windows, go to the directory in the File Explorer app. Click the bar that is circled in the image below and type `cmd`. Press enter and the command line should open up within that directory. Also, you can use an integrated terminal with an IDE of your choice.
@@ -87,11 +87,11 @@ Setup configuration options:
    1. If that doesn't work, try replacing `python` with `python3`.
 
 4. Run the bot once with `python -m dozer`. This will crash, but generate a default config file.
-   1. Dozer uses [json](http://www.json.org/) for its config file
+   1. FTCLink uses [json](http://www.json.org/) for its config file
 
 5. Add the Discord bot account's token to `discord_token` in `config.json`
 
-6. If you have a Google Maps API key, a Blue Alliance API key, an Orange Alliance API key, a Twitch API client ID and client secret, and/or a Reddit client ID and client secret, add them to the appropriate places in `config.json`. For more details on how to get these API keys, [see this file for instructions](tokenInstructions.md). ***If you don't, your bot will still work,*** but you won't be able to use the commands that rely on these tokens.
+6. If you have a Blue Alliance API key or an Orange Alliance API key, add them to the appropriate places in `config.json`. For more details on how to get these API keys, [see this file for instructions](tokenInstructions.md). ***If you don't, your bot will still work,*** but you won't be able to use the commands that rely on these tokens.
 
 7. If you are using Docker, you most likely won't have to do anything. Otherwise, add your database connection info to `db_url` in `config.json` using the following format:
     
@@ -124,14 +124,14 @@ Setup configuration options:
 1. Within the scopes menu under OAuth2, select the "bot" scope
    ![selecting scopes](static/invite1_scopes.png)
 
-2. A new "permissions" menu should appear below. Select all the permissions that you want your instance of Dozer to have. If you want all permissions and you trust your instance wholeheartedly, select "Administrator"
+2. A new "permissions" menu should appear below. Select all the permissions that you want your instance of FTCLink to have. If you want all permissions and you trust your instance wholeheartedly, select "Administrator"
    ![permissions](static/invite2_permissions.png)
 
 3. The bottom of the scopes menu should have a URL. Copy and paste that URL into a new tab in your browser. It'll open a page where you can invite a bot to your server.
    ![oauthInvite](static/invite3_oauthurl.png)
 
 ### Setting up the database systems
-Dozer requires Postgres. You can set up Postgres on your own server or use a service such as ElephantSQL. To make it work in Dozer, 
+FTCLink requires Postgres. You can set up Postgres on your own server or use a service such as ElephantSQL. To make it work in FTCLink, 
 install the psycopg2 pip package, then change the `db_url` key in `config.json` to a URL that follows this format: 
 `postgresql://username:password@host/db_name_in_postgres` with the correct information filled in.
 

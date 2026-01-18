@@ -69,26 +69,26 @@ class General(Cog):
 
     async def _help_all(self, ctx: DozerContext):
         """Gets the help message for all commands."""
-        info = discord.Embed(title='Dozer: Info', description='A guild management bot for FIRST Discord servers',
+        info = discord.Embed(title='FTCLink: Info', description='A guild management bot for FIRST Discord servers',
                              color=discord.Color.blue())
         info.set_thumbnail(url=self.bot.user.avatar)
         info.add_field(name='About',
-                       value="Dozer: A collaborative bot for FIRST Discord servers, developed by the FRC Discord Server Development Team")
+                       value="FTCLink: A collaborative bot for FIRST Discord servers, based on Dozer and developed for FTC")
         info.add_field(name=f'About `{ctx.prefix}{ctx.invoked_with}`', value=inspect.cleandoc("""
         This command can show info for all commands, a specific command, or a category of commands.
         Use `{0}{1} {1}` for more information.
         """.format(ctx.prefix, ctx.invoked_with)), inline=False)
 
         info.add_field(name="Open Source",
-                       value="Dozer is open source! Feel free to view and contribute to our Python code "
+                       value="FTCLink is based on Dozer, an open source bot. View the original code "
                              "[on Github](https://github.com/FRCDiscord/Dozer)", inline=False)
         info.add_field(name='Support',
                        value="If you have any questions or comments you can join our [support server](https://discord.gg/bB8tcQ8) ")
         info.add_field(name="Privacy",
                        value="We are fully committed to protecting your privacy. "
                              "You can view our privacy policy [here](https://github.com/FRCDiscord/Dozer/blob/master/privacy.md)")
-        info.set_footer(text='Dozer Help | all commands | Info page')
-        await self._show_help(ctx, info, 'Dozer: Commands', '', 'all commands', ctx.bot.commands)
+        set_ftclink_footer(info, 'FTCLink Help | all commands | Info page')
+        await self._show_help(ctx, info, 'FTCLink: Commands', '', 'all commands', ctx.bot.commands)
 
     async def _help_command(self, ctx: DozerContext, command):
         """Gets the help message for one command."""
@@ -99,7 +99,7 @@ class General(Cog):
         usage = command.example_usage
         if usage:
             info.add_field(name='Usage', value=usage.format(prefix=ctx.prefix, name=ctx.invoked_with), inline=False)
-        info.set_footer(text=f'Dozer Help | {command.qualified_name!r} command | Info')
+        set_ftclink_footer(info, f'FTCLink Help | {command.qualified_name!r} command | Info')
         await self._show_help(ctx, info, 'Subcommands: {prefix}{name} {signature}', '', '{name!r} command',
                               command.commands if isinstance(command, Group) else set(),
                               name=command.qualified_name, signature=command.signature)
@@ -115,7 +115,7 @@ class General(Cog):
                          footer: str, commands, **format_args):
         """Creates and sends a template help message, with arguments filled in."""
         format_args['prefix'] = ctx.prefix
-        footer = 'Dozer Help | {footer} | Page {page_cnt}'.format(footer=footer, page_cnt='{page_num} of {len_pages}')
+        footer = 'FTCLink Help | {footer} | Page {page_cnt}'.format(footer=footer, page_cnt='{page_num} of {len_pages}')
         # Page info is inserted as a parameter so page_num and len_pages aren't evaluated now
 
         if commands:
@@ -143,7 +143,7 @@ class General(Cog):
                         embed_value = 'No information provided.'
                     page.add_field(name=f'{ctx.prefix}{command.qualified_name} {command.signature}',
                                    value=embed_value, inline=False)
-                page.set_footer(text=footer.format(**format_args))
+                set_ftclink_footer(page, footer.format(**format_args))
                 pages.append(page)
 
             if start_page is not None:
@@ -167,7 +167,7 @@ class General(Cog):
             format_args['page_num'] = 1
             embed = discord.Embed(title=title.format(**format_args), description=description.format(**format_args),
                                   color=discord.Color.blue())
-            embed.set_footer(text=footer.format(**format_args))
+            set_ftclink_footer(embed, footer.format(**format_args))
             await ctx.send(embed=embed)
 
     @has_permissions(change_nickname=True)
@@ -209,7 +209,7 @@ class General(Cog):
         await self.bot.dynamic_prefix.refresh()
         e = discord.Embed(color=blurple)
         e.add_field(name='Success!', value=f"`{ctx.guild}`'s prefix has set to `{prefix}`!")
-        e.set_footer(text='Triggered by ' + escape_markdown(ctx.author.display_name))
+        set_ftclink_footer(e, 'Triggered by ' + escape_markdown(ctx.author.display_name))
         await ctx.send(embed=e)
 
 
