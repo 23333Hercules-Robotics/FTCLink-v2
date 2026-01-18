@@ -228,7 +228,7 @@ class TBAWebhooks(Cog):
                         ON CONFLICT (subscription_url) DO UPDATE
                         SET event_key = $2, notification_types = $3
                         """,
-                        f"https://your-bot-domain.com/tba/webhook",
+                        "https://your-bot-domain.com/tba/webhook",
                         event_key,
                         notification_types
                     )
