@@ -15,11 +15,19 @@ config = {
     'prefix': '&', 'developers': [],
     'cache_size': 20000,
     'tba': {
-        'key': 'Put TBA API key here'
+        'key': 'Put TBA API key here',
+        'webhook_enabled': False,
+        'webhook_secret': 'Put TBA webhook secret here',
+        'webhook_port': 8080
     },
     'ftc-events': {
         'username': 'Put FTC-Events username here',
         'token': 'Put FTC-Events token here'
+    },
+    'supabase': {
+        'enabled': False,
+        'url': 'https://your-project.supabase.co',
+        'key': 'Put Supabase anon key here'
     },
     'db_url': 'postgres://dozer_user:simplepass@postgres',
     'gmaps_key': "PUT GOOGLE MAPS API KEY HERE",

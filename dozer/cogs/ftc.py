@@ -2,7 +2,7 @@
 import asyncio
 import json
 from asyncio import sleep
-from datetime import datetime
+from datetime import datetime, timedelta
 from urllib.parse import urljoin, urlencode, quote as urlquote
 import base64
 
@@ -12,13 +12,15 @@ import discord
 from discord import app_commands
 from discord.ext import commands
 from discord.utils import escape_markdown
+from loguru import logger
 
 from dozer.context import DozerContext
+from dozer.supabase_cache import SupabaseCacheService, BackgroundCacheUpdater
 from ._utils import *
 
 embed_color = discord.Color(0xed791e)
 
-__all__ = ['FTCEventsClient', 'FTCInfo', 'setup']
+__all__ = ['FTCEventsClient', 'CachedFTCEventsClient', 'FTCInfo', 'setup']
 
 
 def get_none_strip(s, key):
@@ -184,6 +186,54 @@ class FTCEventsClient:
                             inline=False)
 
 
+class CachedFTCEventsClient(FTCEventsClient):
+    """
+    A caching wrapper around FTCEventsClient that uses Supabase for caching.
+    This prevents direct client polling of the FTC Events API.
+    """
+    
+    def __init__(self, username: str, token: str, aiohttp_session: aiohttp.ClientSession,
+                 cache_service: SupabaseCacheService = None,
+                 base_url: str = "https://ftc-api.firstinspires.org/v2.0",
+                 ratelimit: bool = True):
+        super().__init__(username, token, aiohttp_session, base_url, ratelimit)
+        self.cache_service = cache_service
+    
+    async def reqjson_cached(self, endpoint, cache_type='teams', season=None, on_400=None, on_other=None):
+        """
+        Make a cached request to the API. Checks Supabase cache first, only hits API if cache is expired.
+        
+        Args:
+            endpoint: API endpoint to request
+            cache_type: Type of cache (events, matches, rankings, teams, opr_stats)
+            season: Season year (defaults to current)
+            on_400: Callback for 400 errors
+            on_other: Callback for other errors
+        """
+        if season is None:
+            season = FTCEventsClient.get_season()
+            
+        # Generate a cache key from the endpoint
+        cache_key = f"season_{season}_{endpoint.replace('/', '_').replace('?', '_')}"
+        
+        # Try to get from Supabase cache first
+        if self.cache_service:
+            cached_data = await self.cache_service.get_cached_data(cache_type, cache_key)
+            if cached_data is not None:
+                logger.debug(f"Using cached data for {cache_type}/{endpoint}")
+                return cached_data
+        
+        # Cache miss or no cache service - fetch from API
+        logger.debug(f"Fetching from API: {cache_type}/{endpoint}")
+        data = await self.reqjson(endpoint, season=season, on_400=on_400, on_other=on_other)
+        
+        # Store in Supabase cache if we got valid data
+        if data is not None and self.cache_service:
+            await self.cache_service.set_cached_data(cache_key, cache_type, data, season)
+            
+        return data
+
+
 class ScoutParser:
     """
     A class to make async requests to FTCScout.
@@ -227,9 +277,44 @@ class FTCInfo(Cog):
     def __init__(self, bot: commands.Bot):
         super().__init__(bot)
         self.http_session = bot.add_aiohttp_ses(aiohttp.ClientSession(timeout=aiohttp.ClientTimeout(5)))
-        self.ftcevents = FTCEventsClient(bot.config['ftc-events']['username'], bot.config['ftc-events']['token'],
-                                         self.http_session)
+        
+        # Initialize Supabase cache service
+        self.cache_service = None
+        self.cache_updater = None
+        
+        if 'supabase' in bot.config and bot.config['supabase'].get('enabled', False):
+            try:
+                self.cache_service = SupabaseCacheService(
+                    bot.config['supabase']['url'],
+                    bot.config['supabase']['key']
+                )
+                logger.info("Supabase cache service initialized for FTC data")
+            except Exception as e:
+                logger.error(f"Failed to initialize Supabase cache: {e}")
+        
+        # Initialize FTC Events client with cache
+        self.ftcevents = CachedFTCEventsClient(
+            bot.config['ftc-events']['username'], 
+            bot.config['ftc-events']['token'],
+            self.http_session,
+            cache_service=self.cache_service
+        )
         self.scparser = ScoutParser(self.http_session)
+        
+        # Start background cache updater if Supabase is enabled
+        if self.cache_service:
+            self.cache_updater = BackgroundCacheUpdater(
+                self.cache_service,
+                self.ftcevents,
+                self.scparser
+            )
+            bot.loop.create_task(self.cache_updater.start())
+            logger.info("Background cache updater started")
+    
+    async def cog_unload(self):
+        """Clean up when the cog is unloaded."""
+        if self.cache_updater:
+            await self.cache_updater.stop()
 
     @group(invoke_without_command=True, aliases=["ftcteam", "toa", "toateam", "ftcteaminfo"])
     async def ftc(self, ctx: DozerContext, *, team_name: str):
