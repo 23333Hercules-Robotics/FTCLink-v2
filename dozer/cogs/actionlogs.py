@@ -13,7 +13,7 @@ from loguru import logger
 from dozer.context import DozerContext
 from ._utils import *
 from .general import blurple
-from .moderation import GuildNewMember
+from ._db_models import GuildNewMember
 from .. import db
 from ..Components.CustomJoinLeaveMessages import CustomJoinLeaveMessages, format_join_leave, send_log
 

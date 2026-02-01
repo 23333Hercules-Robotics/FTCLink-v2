@@ -12,7 +12,7 @@ from discord.utils import escape_markdown
 from dozer.context import DozerContext
 from ._utils import *
 from .actionlogs import CustomJoinLeaveMessages
-from .moderation import MemberRole
+from ._db_models import MemberRole
 from .. import db
 from ..db import *
 
