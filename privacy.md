@@ -7,8 +7,6 @@ We collect and save the following information from our users:
 - Text channel IDs
 - Voice channel IDs
 - User snowflake IDs
-- Message IDs (Only for use of the `&schedulesend` command)
-- Message content (Only for use of the `&schedulesend` command)
 
 All collected information listed above is stored in a database which is protected with multiple levels of physical and digital security
 
@@ -39,7 +37,7 @@ These log files are never taken off platform. They are only used for debugging p
 ### Data removal
 If you wish for all of your data to be removed from our database, please contact us via either Discord or Email.
 
-All message content will automatically be removed after a cache purge or in the case of `&schedulesend` when the message is sent. 
+All message content will automatically be removed after a cache purge. 
 
 ### Contacting us
 - [Support server](https://discord.gg/Y6RFJfhr43)
