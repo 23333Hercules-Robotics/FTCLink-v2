@@ -101,54 +101,81 @@ machine for development or production. You can install PostgreSQL for your platf
 ### Setting up the bot
 
 Setup configuration options:
-- FTCLink can be set up manually, with Python, or with Docker. 
-- Docker allows you to run programs the exact same way on different platforms using [containers](https://www.docker.com/resources/what-container). **Docker also allows FTCLink to set up many of the dependencies** (particularly lavalink, which is used for the music functionality) **automatically.** To use FTCLink with the Docker configuration
+- FTCLink can be set up manually with Python, or with Docker. 
+- **For standard Python hosting environments (VPS, cloud servers, etc.)**, follow the manual Python setup below.
+- Docker allows you to run programs the exact same way on different platforms using [containers](https://www.docker.com/resources/what-container). **Docker also allows FTCLink to set up many of the dependencies** (particularly lavalink, which is used for the music functionality) **automatically.**
 
-1. If you are using Docker, download and install it for your platform [here](https://www.docker.com/products/docker-desktop). Additional documentation can be found [here](https://docs.docker.com/desktop/), if needed.
+#### Python Setup (Standard Hosting)
 
-2. Open your command line/terminal interface and go to the directory where FTCLink's code is located.
+1. Open your command line/terminal interface and navigate to the directory where FTCLink's code is located.
    1. If you're not familiar with how to do that:
       1. On Windows, open CMD or Powershell. On Mac and Linux, open the Terminal. and type `cd "path/to/directory"`.
          Alternatively, on Windows, go to the directory in the File Explorer app. Click the bar that is circled in the image below and type `cmd`. Press enter and the command line should open up within that directory. Also, you can use an integrated terminal with an IDE of your choice.
          ![open the cmd within a directory](static/fileExplorerBar.png)
 
-3. Install dependencies with `python -m pip install -Ur requirements.txt` in your command line interface.
+2. Install dependencies with `python -m pip install -Ur requirements.txt` in your command line interface.
    1. If that doesn't work, try replacing `python` with `python3`.
 
-4. Run the bot once with `python -m dozer`. This will crash, but generate a default config file.
-   1. FTCLink uses [json](http://www.json.org/) for its config file
+3. Run the bot once with `python -m dozer`. This will crash, but generate a default config file.
+   1. **Important**: Always run the bot using `python -m dozer` (as a module), not by running `dozer/bot.py` directly. Direct execution of bot.py will fail with import errors.
+   2. FTCLink uses [json](http://www.json.org/) for its config file
 
-5. Add the Discord bot account's token to `discord_token` in `config.json`
+#### Docker Setup (Optional)
 
-6. **[AUTOMATIC] Native Database Caching:** FTCLink automatically uses its native PostgreSQL database for caching FTC Events API responses. No additional setup required! The caching system prevents direct API polling and improves performance. See [CACHING.md](CACHING.md) for details.
+1. If you are using Docker, download and install it for your platform [here](https://www.docker.com/products/docker-desktop). Additional documentation can be found [here](https://docs.docker.com/desktop/), if needed.
 
-7. If you have a Blue Alliance API key or an Orange Alliance API key, add them to the appropriate places in `config.json`. For more details on how to get these API keys, [see this file for instructions](tokenInstructions.md). ***If you don't, your bot will still work,*** but you won't be able to use the commands that rely on these tokens.
+2. Follow steps from the Python setup above to navigate to the FTCLink directory.
 
-8. If you are using Docker, you most likely won't have to do anything. Otherwise, add your database connection info to `db_url` in `config.json` using the following format:
+#### Configuration
+
+4. Add the Discord bot account's token to `discord_token` in `config.json`
+
+5. **[AUTOMATIC] Native Database Caching:** FTCLink automatically uses its native PostgreSQL database for caching FTC Events API responses. No additional setup required! The caching system prevents direct API polling and improves performance. See [CACHING.md](CACHING.md) for details.
+
+6. If you have a Blue Alliance API key or an Orange Alliance API key, add them to the appropriate places in `config.json`. For more details on how to get these API keys, [see this file for instructions](tokenInstructions.md). ***If you don't, your bot will still work,*** but you won't be able to use the commands that rely on these tokens.
+
+7. Add your database connection info to `db_url` in `config.json` using the following format:
     
    ```postgres://user:password@host:port```
     
-   Replace `host` with your database IP, or `localhost` if it's on the same PC. `port` is by default 5432. If the user has no password, you can remove the colon and password. The default user for the above installation is `postgres`, however we strongly suggest making a `dozer` user for security reasons using [this guide](https://www.postgresql.org/docs/current/app-createuser.html).
+   * **For Docker**: You most likely won't need to change this.
+   * **For standard Python hosting**: Replace `host` with your database IP, or `localhost` if it's on the same PC. `port` is by default 5432. If the user has no password, you can remove the colon and password. The default user for PostgreSQL is `postgres`, however we strongly suggest making a `dozer` user for security reasons using [this guide](https://www.postgresql.org/docs/current/app-createuser.html).
 
-9. Add your Discord user ID, and anyone else's ID who should be able to use the developer commands, to the list `developers` in `config.json`
+8. Add your Discord user ID, and anyone else's ID who should be able to use the developer commands, to the list `developers` in `config.json`
    1. Be careful giving this out. Developers can control everything your bot does and potentially get your [bot user token!](#getting-your-discord-bot-token)
 
-10. The default command prefix is &. If this is already in use on your server or you would like another prefix, you can change the `prefix` value in `config.json`.
+9. The default command prefix is &. If this is already in use on your server or you would like another prefix, you can change the `prefix` value in `config.json`.
 
-11. To configure lavalink:
+10. To configure lavalink:
 * **If you are using Docker,** Open up Docker Desktop and find the lavalink container's name. Change the host IP listed in `config.json` to that name. For example, in the following image below, the config.json file should say `"host": "dozerRecent_lavalink_1"`. Set the `port` value to the port that's listed in `docker-compose.yml`.
    
    ![Finding the lavalink container name](static/containerNames.png)
 
 * **If you are not using Docker**, set the `host` and `port` values to which values that you have set up.
 
-11. Run the bot again. If you're using Docker, run `docker-compose up` twice in your command line interface. If you are setting it up manually, repeat the command in step 4. You should see `Signed in as username#discrim (id)` after a few seconds.
+11. Run the bot:
+    * **For standard Python hosting**: Run `python -m dozer` in your command line interface. You should see `Signed in as username#discrim (id)` after a few seconds.
+    * **For Docker**: Run `docker-compose up` twice in your command line interface.
+
 12. When using Docker:
     1. Make sure the Docker for Desktop client is running. On Windows, you have to open up the app and either skip the tutorial or follow it when running it for the first time, and then you can run the command. (Note: it's not necessary to do the tutorial.) By default, Docker runs in the background after that first startup, so you should be fine.
     2. The first time you run `docker-compose up`, you are building it and the bot won't go online. Once the building process seems to be done, press ctrl+C and run the command again.
     3. As of this writing, `Signed in as` message is pretty far up, as seen highlighted in orange in the image below.
     4. Sometimes, the bot can't connect to the lavalink IP, as circled in blue in the image below. In that case, simply run the bot command `{prefix}restart` and it should work.
 ![dockerstartup](static/dockerstartup.png)
+
+### Troubleshooting
+
+#### ImportError: attempted relative import with no known parent package
+
+If you see this error, it means you're trying to run the bot incorrectly. **Do not** run `python dozer/bot.py` or `python bot.py` directly. 
+
+**Solution**: Always run the bot as a module using:
+```bash
+python -m dozer
+```
+
+This error occurs because the bot's code uses relative imports (e.g., `from . import utils`) which require the code to be run as part of a package. Running individual Python files directly bypasses the package structure.
 
 ### Adding the bot to your server
 
