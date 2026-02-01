@@ -128,36 +128,36 @@ Setup configuration options:
 
 #### Configuration
 
-4. Add the Discord bot account's token to `discord_token` in `config.json`
+1. Add the Discord bot account's token to `discord_token` in `config.json`
 
-5. **[AUTOMATIC] Native Database Caching:** FTCLink automatically uses its native PostgreSQL database for caching FTC Events API responses. No additional setup required! The caching system prevents direct API polling and improves performance. See [CACHING.md](CACHING.md) for details.
+2. **[AUTOMATIC] Native Database Caching:** FTCLink automatically uses its native PostgreSQL database for caching FTC Events API responses. No additional setup required! The caching system prevents direct API polling and improves performance. See [CACHING.md](CACHING.md) for details.
 
-6. If you have a Blue Alliance API key or an Orange Alliance API key, add them to the appropriate places in `config.json`. For more details on how to get these API keys, [see this file for instructions](tokenInstructions.md). ***If you don't, your bot will still work,*** but you won't be able to use the commands that rely on these tokens.
+3. If you have a Blue Alliance API key or an Orange Alliance API key, add them to the appropriate places in `config.json`. For more details on how to get these API keys, [see this file for instructions](tokenInstructions.md). ***If you don't, your bot will still work,*** but you won't be able to use the commands that rely on these tokens.
 
-7. Add your database connection info to `db_url` in `config.json` using the following format:
+4. Add your database connection info to `db_url` in `config.json` using the following format:
     
    ```postgres://user:password@host:port```
     
    * **For Docker**: You most likely won't need to change this.
    * **For standard Python hosting**: Replace `host` with your database IP, or `localhost` if it's on the same PC. `port` is by default 5432. If the user has no password, you can remove the colon and password. The default user for PostgreSQL is `postgres`, however we strongly suggest making a `dozer` user for security reasons using [this guide](https://www.postgresql.org/docs/current/app-createuser.html).
 
-8. Add your Discord user ID, and anyone else's ID who should be able to use the developer commands, to the list `developers` in `config.json`
+5. Add your Discord user ID, and anyone else's ID who should be able to use the developer commands, to the list `developers` in `config.json`
    1. Be careful giving this out. Developers can control everything your bot does and potentially get your [bot user token!](#getting-your-discord-bot-token)
 
-9. The default command prefix is &. If this is already in use on your server or you would like another prefix, you can change the `prefix` value in `config.json`.
+6. The default command prefix is &. If this is already in use on your server or you would like another prefix, you can change the `prefix` value in `config.json`.
 
-10. To configure lavalink:
+7. To configure lavalink:
 * **If you are using Docker,** Open up Docker Desktop and find the lavalink container's name. Change the host IP listed in `config.json` to that name. For example, in the following image below, the config.json file should say `"host": "dozerRecent_lavalink_1"`. Set the `port` value to the port that's listed in `docker-compose.yml`.
    
    ![Finding the lavalink container name](static/containerNames.png)
 
 * **If you are not using Docker**, set the `host` and `port` values to which values that you have set up.
 
-11. Run the bot:
+8. Run the bot:
     * **For standard Python hosting**: Run `python -m dozer` in your command line interface. You should see `Signed in as username#discrim (id)` after a few seconds.
     * **For Docker**: Run `docker-compose up` twice in your command line interface.
 
-12. When using Docker:
+9. When using Docker:
     1. Make sure the Docker for Desktop client is running. On Windows, you have to open up the app and either skip the tutorial or follow it when running it for the first time, and then you can run the command. (Note: it's not necessary to do the tutorial.) By default, Docker runs in the background after that first startup, so you should be fine.
     2. The first time you run `docker-compose up`, you are building it and the bot won't go online. Once the building process seems to be done, press ctrl+C and run the command again.
     3. As of this writing, `Signed in as` message is pretty far up, as seen highlighted in orange in the image below.
