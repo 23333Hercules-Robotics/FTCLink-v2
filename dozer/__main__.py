@@ -9,7 +9,7 @@ import sentry_sdk
 from loguru import logger
 
 if sys.version_info < (3, 8):
-    sys.exit('Dozer requires Python 3.8 or higher to run. This is version ' + '.'.join(map(str, sys.version_info[:3])) + '.')
+    sys.exit(f'Dozer requires Python 3.8 or higher to run. This is version {".".join(map(str, sys.version_info[:3]))}.')
 
 config = {
     'prefix': '&', 'developers': [],
