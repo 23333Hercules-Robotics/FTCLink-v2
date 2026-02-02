@@ -26,3 +26,8 @@ class FTCCacheGeneric(DatabaseTable):
             CREATE INDEX idx_{cls.__tablename__}_last_updated 
             ON {cls.__tablename__}(last_updated)
             """)
+
+
+async def setup(bot):
+    """Setup function for Discord bot - this module only provides database tables."""
+    pass
