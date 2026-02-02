@@ -150,7 +150,7 @@ class Dozer(commands.Bot):
     def run(self, *args, **kwargs):
         token = self.config['discord_token']
         del self.config['discord_token']  # Prevent token dumping
-        super().run(token)
+        super().run(token, *args, **kwargs)
 
     async def shutdown(self, restart: bool = False):
         """Shuts down the bot"""
