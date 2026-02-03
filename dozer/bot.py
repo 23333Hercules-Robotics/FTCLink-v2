@@ -15,6 +15,7 @@ from sentry_sdk import capture_exception
 from . import utils
 from .cogs import _utils
 from .cogs._utils import CommandMixin
+from .cogs import _db_models  # Import database models before migration
 from .context import DozerContext
 from .db import db_init, db_migrate
 
