@@ -188,7 +188,7 @@ class NameGame(Cog):
             ng skip
             ng gameinfo
         """
-        await self.info.callback(ctx)
+        await self.info.callback(self, ctx)
 
     ng.example_usage = """
     `{prefix}ng` - show a description on how the robotics team namegame works. 
