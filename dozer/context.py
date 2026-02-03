@@ -21,10 +21,11 @@ class DozerContext(commands.Context):
             # Check if branding is already present
             if embed.footer and embed.footer.text:
                 if "Powered by Orihost" not in embed.footer.text:
-                    # Preserve icon_url if it exists
-                    icon_url = embed.footer.icon_url if embed.footer.icon_url else discord.Embed.Empty
-                    # Append to existing footer
-                    embed.set_footer(text=f"{embed.footer.text} | {branding}", icon_url=icon_url)
+                    # Append to existing footer, preserving icon_url if it exists
+                    if embed.footer.icon_url:
+                        embed.set_footer(text=f"{embed.footer.text} | {branding}", icon_url=embed.footer.icon_url)
+                    else:
+                        embed.set_footer(text=f"{embed.footer.text} | {branding}")
             else:
                 # Set new footer with branding
                 embed.set_footer(text=branding)
