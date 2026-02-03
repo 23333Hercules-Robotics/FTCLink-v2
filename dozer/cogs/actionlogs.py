@@ -291,7 +291,8 @@ class Actionlog(Cog):
         guild_id = guild.id
         channel_id = payload.channel_id
         user_id = author['id']
-        if (self.bot.get_user(int(user_id))).bot:
+        user = self.bot.get_user(int(user_id))
+        if user and user.bot:
             return  # Breakout if the user is a bot
         message_id = payload.message_id
         link = f"https://discordapp.com/channels/{guild_id}/{channel_id}/{message_id}"

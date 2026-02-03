@@ -93,23 +93,27 @@ class NativeCacheService:
             return False
             
         try:
-            # Ensure data is JSON-serializable
-            if not isinstance(data, (dict, list)):
-                data = json.loads(json.dumps(data))
+            # Convert data to JSON string for jsonb field
+            # PostgreSQL jsonb fields require JSON string input via asyncpg
+            if isinstance(data, (dict, list)):
+                data_json = json.dumps(data)
+            else:
+                # If it's already a string, ensure it's valid JSON
+                data_json = json.dumps(json.loads(str(data)))
             
             async with Pool.acquire() as conn:
                 await conn.execute(
                     """
                     INSERT INTO ftc_api_cache (cache_key, cache_type, cache_data, season, last_updated)
-                    VALUES ($1, $2, $3, $4, NOW())
+                    VALUES ($1, $2, $3::jsonb, $4, NOW())
                     ON CONFLICT (cache_key) 
                     DO UPDATE SET 
-                        cache_data = $3, 
+                        cache_data = $3::jsonb, 
                         cache_type = $2,
                         season = $4,
                         last_updated = NOW()
                     """,
-                    cache_key, cache_type, data, season
+                    cache_key, cache_type, data_json, season
                 )
             
             logger.debug(f"Cache SET: {cache_type}/{cache_key}")
