@@ -1,7 +1,6 @@
 """Shared database models used by multiple cogs"""
 
 from .. import db
-from ..db import Pool
 
 
 class MemberRole(db.DatabaseTable):
@@ -89,7 +88,7 @@ class FTCCacheTable(db.DatabaseTable):
     @classmethod
     async def initial_create(cls):
         """Create the table in the database"""
-        async with Pool.acquire() as conn:
+        async with db.Pool.acquire() as conn:
             await conn.execute(f"""
             CREATE TABLE {cls.__tablename__} (
                 cache_key text PRIMARY KEY,
@@ -116,7 +115,7 @@ class WordFilter(db.DatabaseTable):
     @classmethod
     async def initial_create(cls):
         """Create the table in the database"""
-        async with Pool.acquire() as conn:
+        async with db.Pool.acquire() as conn:
             await conn.execute(f"""
             CREATE TABLE {cls.__tablename__} (
             filter_id serial PRIMARY KEY NOT NULL,
@@ -154,7 +153,7 @@ class WordFilterSetting(db.DatabaseTable):
     @classmethod
     async def initial_create(cls):
         """Create the table in the database"""
-        async with Pool.acquire() as conn:
+        async with db.Pool.acquire() as conn:
             await conn.execute(f"""
             CREATE TABLE {cls.__tablename__} (
             id serial PRIMARY KEY NOT NULL,
@@ -188,7 +187,7 @@ class WordFilterRoleWhitelist(db.DatabaseTable):
     @classmethod
     async def initial_create(cls):
         """Create the table in the database"""
-        async with Pool.acquire() as conn:
+        async with db.Pool.acquire() as conn:
             await conn.execute(f"""
             CREATE TABLE {cls.__tablename__} (
             guild_id bigint NOT NULL,
