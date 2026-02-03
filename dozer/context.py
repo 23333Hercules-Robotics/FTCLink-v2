@@ -16,10 +16,17 @@ class DozerContext(commands.Context):
         # Add branding footer to all embeds
         if 'embed' in kwargs and kwargs['embed'] is not None:
             embed = kwargs['embed']
-            if not embed.footer or not embed.footer.text:
-                embed.set_footer(text="Powered by Orihost (tm) · Based off FTC Dozer")
-            elif "Powered by Orihost" not in embed.footer.text:
-                # Append to existing footer
-                embed.set_footer(text=f"{embed.footer.text} · Powered by Orihost (tm) · Based off FTC Dozer")
+            branding = "Powered by Orihost (tm) · Based off FTC Dozer"
+            
+            # Check if branding is already present
+            if embed.footer and embed.footer.text:
+                if "Powered by Orihost" not in embed.footer.text:
+                    # Preserve icon_url if it exists
+                    icon_url = embed.footer.icon_url if embed.footer.icon_url else discord.Embed.Empty
+                    # Append to existing footer
+                    embed.set_footer(text=f"{embed.footer.text} | {branding}", icon_url=icon_url)
+            else:
+                # Set new footer with branding
+                embed.set_footer(text=branding)
         
         return await super().send(content, **kwargs)
