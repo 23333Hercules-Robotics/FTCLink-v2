@@ -46,12 +46,12 @@ class Dozer(commands.Bot):
         self.aiohttp_sessions = []
 
     async def setup_hook(self) -> None:
+        await db_init(self.config['db_url'])
+        await db_migrate()
         for ext in os.listdir('dozer/cogs'):
             cog_name = ext[:-3]
             if not ext.startswith(('_', '.')) and ext.endswith(".py") and not cog_name in self.config.get("disabled_cogs", []):
                 await self.load_extension('dozer.cogs.' + cog_name)  # Remove '.py'
-        await db_init(self.config['db_url'])
-        await db_migrate()
         await self.tree.sync()
 
     async def on_ready(self):
