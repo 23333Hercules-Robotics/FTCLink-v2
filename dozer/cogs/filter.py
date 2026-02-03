@@ -9,6 +9,7 @@ from discord.ext.commands import guild_only, has_permissions
 
 from dozer.context import DozerContext
 from ._utils import *
+from ._db_models import WordFilter, WordFilterSetting, WordFilterRoleWhitelist
 from .. import db
 
 
@@ -322,108 +323,3 @@ class Filter(Cog):
 async def setup(bot):
     """Setup cog"""
     await bot.add_cog(Filter(bot))
-
-
-"""Database Tables"""
-
-
-class WordFilter(db.DatabaseTable):
-    """Object for each filter"""
-    __tablename__ = 'word_filters'
-    __uniques__ = 'filter_id'
-
-    @classmethod
-    async def initial_create(cls):
-        """Create the table in the database"""
-        async with db.Pool.acquire() as conn:
-            await conn.execute(f"""
-            CREATE TABLE {cls.__tablename__} (
-            filter_id serial PRIMARY KEY NOT NULL,
-            enabled boolean default true NOT NULL,
-            guild_id bigint NOT NULL,
-            friendly_name varchar null,
-            pattern varchar NOT NULL
-            )""")
-
-    def __init__(self, guild_id: int, friendly_name: str, pattern: str, enabled: bool = True, filter_id: int = None):
-        super().__init__()
-        self.filter_id = filter_id
-        self.guild_id = guild_id
-        self.enabled = enabled
-        self.friendly_name = friendly_name
-        self.pattern = pattern
-
-    @classmethod
-    async def get_by(cls, **kwargs):
-        results = await super().get_by(**kwargs)
-        result_list = []
-        for result in results:
-            obj = WordFilter(guild_id=result.get("guild_id"), friendly_name=result.get("friendly_name"),
-                             pattern=result.get("pattern"), enabled=result.get("enabled"),
-                             filter_id=result.get("filter_id"))
-            result_list.append(obj)
-        return result_list
-
-
-class WordFilterSetting(db.DatabaseTable):
-    """Each filter-related setting"""
-    __tablename__ = 'word_filter_settings'
-    __uniques__ = 'id'
-
-    @classmethod
-    async def initial_create(cls):
-        """Create the table in the database"""
-        async with db.Pool.acquire() as conn:
-            await conn.execute(f"""
-            CREATE TABLE {cls.__tablename__} (
-            id serial PRIMARY KEY NOT NULL,
-            setting_type varchar NOT NULL,
-            guild_id bigint NOT NULL,
-            value varchar NOT NULL
-            )""")
-
-    def __init__(self, guild_id: int, setting_type: str, value: str):
-        super().__init__()
-        self.guild_id = guild_id
-        self.setting_type = setting_type
-        self.value = value
-
-    @classmethod
-    async def get_by(cls, **kwargs):
-        results = await super().get_by(**kwargs)
-        result_list = []
-        for result in results:
-            obj = WordFilterSetting(guild_id=result.get("guild_id"), setting_type=result.get("setting_type"),
-                                    value=result.get('value'))
-            result_list.append(obj)
-        return result_list
-
-
-class WordFilterRoleWhitelist(db.DatabaseTable):
-    """Object for each whitelisted role"""
-    __tablename__ = 'word_filter_role_whitelist'
-    __uniques__ = 'role_id'
-
-    @classmethod
-    async def initial_create(cls):
-        """Create the table in the database"""
-        async with db.Pool.acquire() as conn:
-            await conn.execute(f"""
-            CREATE TABLE {cls.__tablename__} (
-            guild_id bigint NOT NULL,
-            role_id bigint PRIMARY KEY NOT NULL 
-            )""")
-
-    def __init__(self, guild_id: int, role_id: int):
-        super().__init__()
-        self.role_id = role_id
-        self.guild_id = guild_id
-
-    @classmethod
-    async def get_by(cls, **kwargs):
-        results = await super().get_by(**kwargs)
-        result_list = []
-        for result in results:
-            obj = WordFilterRoleWhitelist(guild_id=result.get("guild_id"), role_id=result.get("role_id"))
-            result_list.append(obj)
-        return result_list

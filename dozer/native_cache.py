@@ -6,35 +6,8 @@ from typing import Optional, Dict, Any
 from urllib.parse import urlencode
 
 from loguru import logger
-from dozer.db import Pool, DatabaseTable
-
-
-class FTCCacheTable(DatabaseTable):
-    """Generic cache table for all FTC Events API responses using native PostgreSQL."""
-    __tablename__ = 'ftc_api_cache'
-    __uniques__ = ['cache_key']
-    __versions__ = []
-
-    @classmethod
-    async def initial_create(cls):
-        """Create the table in the database"""
-        async with Pool.acquire() as conn:
-            await conn.execute(f"""
-            CREATE TABLE {cls.__tablename__} (
-                cache_key text PRIMARY KEY,
-                cache_type text NOT NULL,
-                cache_data jsonb NOT NULL,
-                season int,
-                last_updated timestamp NOT NULL DEFAULT NOW()
-            )
-            """)
-            # Create an index on cache_type and last_updated for efficient queries
-            await conn.execute(f"""
-            CREATE INDEX idx_{cls.__tablename__}_type ON {cls.__tablename__}(cache_type)
-            """)
-            await conn.execute(f"""
-            CREATE INDEX idx_{cls.__tablename__}_updated ON {cls.__tablename__}(last_updated)
-            """)
+from dozer.db import Pool
+from dozer.cogs._db_models import FTCCacheTable
 
 
 class NativeCacheService:
@@ -120,23 +93,27 @@ class NativeCacheService:
             return False
             
         try:
-            # Ensure data is JSON-serializable
-            if not isinstance(data, (dict, list)):
-                data = json.loads(json.dumps(data))
+            # Convert data to JSON string for jsonb field
+            # PostgreSQL jsonb fields require JSON string input via asyncpg
+            if isinstance(data, (dict, list)):
+                data_json = json.dumps(data)
+            else:
+                # If it's already a string, ensure it's valid JSON
+                data_json = json.dumps(json.loads(str(data)))
             
             async with Pool.acquire() as conn:
                 await conn.execute(
                     """
                     INSERT INTO ftc_api_cache (cache_key, cache_type, cache_data, season, last_updated)
-                    VALUES ($1, $2, $3, $4, NOW())
+                    VALUES ($1, $2, $3::jsonb, $4, NOW())
                     ON CONFLICT (cache_key) 
                     DO UPDATE SET 
-                        cache_data = $3, 
+                        cache_data = $3::jsonb, 
                         cache_type = $2,
                         season = $4,
                         last_updated = NOW()
                     """,
-                    cache_key, cache_type, data, season
+                    cache_key, cache_type, data_json, season
                 )
             
             logger.debug(f"Cache SET: {cache_type}/{cache_key}")
