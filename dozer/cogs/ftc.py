@@ -311,7 +311,7 @@ class FTCInfo(Cog):
         Get information on an FTC team from FTC-Events.
         If no subcommand is specified, the `team` subcommand is inferred, and the argument is taken as a team number.
         """
-        await self.searchteam.callback(self, ctx, team_name)
+        await ctx.invoke(self.searchteam, team_name=team_name)
 
     ftc.example_usage = """
     `{prefix}ftc 5667` - show information on team 5667, Robominers
@@ -364,7 +364,7 @@ class FTCInfo(Cog):
     async def searchteam(self, ctx: DozerContext, team_name: str):
         """Search for an FTC team by name."""
         if team_name.isdigit():
-            await self.team.callback(self, ctx, int(team_name))
+            await ctx.invoke(self.team, team_num=int(team_name))
             return
         if len(team_name) < 3:
             await ctx.send("Please provide a longer team name to search for.")
@@ -376,7 +376,7 @@ class FTCInfo(Cog):
                 return
             team_data = await res.json(content_type=None)
             if len(team_data) == 1:
-                await self.team.callback(self, ctx, team_data[0]['number'])
+                await ctx.invoke(self.team, team_num=team_data[0]['number'])
                 return
             manyteams = False
             if len(team_data) > 5: # funny thing, ?limit doesn't work, confirmed with ftcscout devs, so we do it ourselves
@@ -420,7 +420,7 @@ class FTCInfo(Cog):
     @app_commands.describe(team_num="The number of the team you're interested in getting info")
     async def topr(self, ctx: DozerContext, team_num: int):
         """Get information with OPR on an FTC team by number."""
-        await self.opr.callback(self, ctx, team_num)
+        await ctx.invoke(self.opr, team_num=team_num)
 
 
     @ftc.command(aliases=["topr", "ftcopr"])
@@ -592,7 +592,7 @@ class FTCInfo(Cog):
     def create_team_callback(self, ctx, team_num):
         """Creates a callback for the search interaction buttons"""
         async def callback(interaction):
-            await self.team.callback(self, ctx, team_num)
+            await ctx.invoke(self.team, team_num=team_num)
             await interaction.response.defer()
 
         return callback
