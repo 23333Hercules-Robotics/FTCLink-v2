@@ -592,8 +592,8 @@ class FTCInfo(Cog):
     def create_team_callback(self, ctx, team_num):
         """Creates a callback for the search interaction buttons"""
         async def callback(interaction):
-            await ctx.invoke(self.team, team_num=team_num)
             await interaction.response.defer()
+            await ctx.invoke(self.team, team_num=team_num)
 
         return callback
 
