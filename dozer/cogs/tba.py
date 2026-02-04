@@ -36,7 +36,7 @@ class TBA(Cog):
         Get FRC-related information from The Blue Alliance.
         If no subcommand is specified, the `team` subcommand is inferred, and the argument is taken as a team number.
         """
-        await self.team.callback(self, ctx, team_num)
+        await self.team.callback(ctx, team_num)
 
     tba.example_usage = """
     `{prefix}tba 5052` - show information on team 5052, the RoboLobos
