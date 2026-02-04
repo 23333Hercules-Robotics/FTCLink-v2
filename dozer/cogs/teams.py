@@ -21,9 +21,9 @@ class Teams(Cog):
     async def setteam(self, ctx: DozerContext, team_type: str, team_number: int):
         """Sets an association with your team in the database."""
         team_type = team_type.casefold()
-        dbcheck = await TeamNumbers.get_by(user_id=ctx.author.id, team_type=team_type, team_number=team_number)
+        dbcheck = await TeamNumbers.get_by(user_id=ctx.author.id, team_type=team_type, team_number=str(team_number))
         if not dbcheck:
-            await TeamNumbers(user_id=ctx.author.id, team_number=team_number, team_type=team_type).update_or_add()
+            await TeamNumbers(user_id=ctx.author.id, team_number=str(team_number), team_type=team_type).update_or_add()
             await ctx.send("Team number set!")
         else:
             raise BadArgument("You are already associated with that team!")
@@ -36,9 +36,9 @@ class Teams(Cog):
     async def removeteam(self, ctx: DozerContext, team_type: str, team_number: int):
         """Removes an association with a team in the database."""
         team_type = team_type.casefold()
-        results = await TeamNumbers.get_by(user_id=ctx.author.id, team_type=team_type, team_number=team_number)
+        results = await TeamNumbers.get_by(user_id=ctx.author.id, team_type=team_type, team_number=str(team_number))
         if len(results) != 0:
-            await TeamNumbers.delete(user_id=ctx.author.id, team_number=team_number, team_type=team_type)
+            await TeamNumbers.delete(user_id=ctx.author.id, team_number=str(team_number), team_type=team_type)
             await ctx.send(f"Removed association with {team_type} team {team_number}")
         else:
             await ctx.send("Couldn't find any associations with that team!")
@@ -93,7 +93,7 @@ class Teams(Cog):
         for team in teams:
             e = discord.Embed(type='rich')
             e.title = f'Members going to {event_key}'
-            members = await TeamNumbers.get_by(team_type=event_type.lower(), team_number=team)
+            members = await TeamNumbers.get_by(team_type=event_type.lower(), team_number=str(team))
             memstr = ""
             for member in members:
                 mem = ctx.guild.get_member(member.user_id)
@@ -131,7 +131,7 @@ class Teams(Cog):
     async def onteam(self, ctx: DozerContext, team_type: str, team_number: int):
         """Allows you to see who has associated themselves with a particular team."""
         team_type = team_type.casefold()
-        users = await TeamNumbers.get_by(team_type=team_type, team_number=team_number)
+        users = await TeamNumbers.get_by(team_type=team_type, team_number=str(team_number))
         if len(users) == 0:
             await ctx.send("Nobody on that team found!")
         else:

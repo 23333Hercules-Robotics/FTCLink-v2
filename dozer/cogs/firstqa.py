@@ -162,8 +162,15 @@ class QA(commands.Cog):
                     currEmbed.set_footer(text=f"Page {page} of {len(json_parsed)}")
                     embeds.append(currEmbed)
                     page += 1
-                    
-            await paginate(ctx, embeds)
+                
+                await paginate(ctx, embeds)
+            else:
+                # Handle error case - no results found
+                embed.add_field(
+                    name="Error",
+                    value="No rules found matching your search query"
+                )
+                await ctx.send(embed=embed, ephemeral=True)
             return
             
         else:  

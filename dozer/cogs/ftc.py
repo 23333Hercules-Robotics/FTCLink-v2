@@ -311,7 +311,7 @@ class FTCInfo(Cog):
         Get information on an FTC team from FTC-Events.
         If no subcommand is specified, the `team` subcommand is inferred, and the argument is taken as a team number.
         """
-        await self.searchteam.callback(self, ctx, team_name)  # This works but Pylint throws an error
+        await self.searchteam.callback(self, ctx, team_name)
 
     ftc.example_usage = """
     `{prefix}ftc 5667` - show information on team 5667, Robominers
@@ -347,7 +347,7 @@ class FTCInfo(Cog):
             e.add_field(name='Name', value=get_none_strip(team_data, 'nameShort') or "_ _")
             e.add_field(name='Rookie Year', value=get_none_strip(team_data, 'rookieYear') or "Unknown")
             e.add_field(name='Location',
-                        value=', '.join((team_data['city'], team_data['stateProv'], team_data['country'])) or "Unknown")
+                        value=', '.join(filter(None, (team_data.get('city'), team_data.get('stateProv'), team_data.get('country')))) or "Unknown")
             e.add_field(name='Org/Sponsors', value=team_data.get('nameFull', "").strip() or "_ _")
             e.add_field(name='Website', value=website or 'n/a')
             e.add_field(name='FTCScout Page', value=f'https://ftcscout.org/teams/{team_num}')
@@ -454,8 +454,7 @@ class FTCInfo(Cog):
             e.add_field(name='Name', value=get_none_strip(team_data, 'nameShort') or "_ _")
             e.add_field(name='Rookie Year', value=get_none_strip(team_data, 'rookieYear') or "Unknown")
             e.add_field(name='Location',
-                        value=', '.join(
-                            (team_data['city'], team_data['stateProv'], team_data['country'])) or "Unknown")
+                        value=', '.join(filter(None, (team_data.get('city'), team_data.get('stateProv'), team_data.get('country')))) or "Unknown")
             e.add_field(name='Org/Sponsors', value=team_data.get('nameFull', "").strip() or "_ _")
             e.add_field(name='Website', value=website or 'n/a')
             e.add_field(name='FTCScout Page', value=f'https://ftcscout.org/teams/{team_num}')
